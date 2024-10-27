@@ -2,7 +2,6 @@ import os
 from pymongo import MongoClient
 import urllib.parse
 import streamlit as st
-import certifi
 from datetime import datetime
 from gridfs import GridFS
 from bson import ObjectId
@@ -10,49 +9,29 @@ from bson import ObjectId
 class Database:
     def __init__(self):
         try:
-            # Get credentials from Streamlit secrets or use defaults
-            if hasattr(st, "secrets"):
-                username = st.secrets.mongodb.username
-                password = st.secrets.mongodb.password
-                cluster = st.secrets.mongodb.cluster
-                database = st.secrets.mongodb.database
-            else:
-                username = "pusp_msme_app2"
-                password = "unionbank"
-                cluster = "msme-loan-app.a0gwq"
-                database = "msme_loan_db"
+            # Direct connection string - simpler approach
+            username = "puspendersharma"
+            password = "unionbank"
             
-            # URL encode credentials
-            username_encoded = urllib.parse.quote_plus(username)
-            password_encoded = urllib.parse.quote_plus(password)
+            # Create the connection string
+            connection_string = f"mongodb+srv://{username}:{password}@msme-loan-app.a0gwq.mongodb.net/msme_loan_db?authSource=admin"
             
-            # Simplified connection string without SSL options in URL
-            connection_string = f"mongodb+srv://{username_encoded}:{password_encoded}@{cluster}.mongodb.net/?retryWrites=true&w=majority"
-            
-            # Initialize client with modified SSL settings
-            self.client = MongoClient(
-                connection_string,
-                tls=True,
-                tlsCAFile=certifi.where(),
-                serverSelectionTimeoutMS=30000,  # Increased timeout
-                connectTimeoutMS=30000,
-                retryWrites=True
-            )
+            # Initialize client with minimal settings
+            self.client = MongoClient(connection_string)
             
             # Test connection
             self.client.admin.command('ping')
             
             # Initialize database and GridFS
-            self.db = self.client[database]
+            self.db = self.client['msme_loan_db']
             self.fs = GridFS(self.db)
             print("MongoDB connection successful!")
             
         except Exception as e:
             error_msg = f"Database connection error: {str(e)}"
-            print(error_msg)  # Print to console for debugging
+            print(error_msg)
             st.error(error_msg)
-            raise e
-            
+            raise e            
     def save_application(self, application_data):
         """Save loan application data"""
         try:
