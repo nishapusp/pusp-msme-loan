@@ -9,42 +9,42 @@ from bson import ObjectId
 class Database:
     def __init__(self):
         try:
-        # Admin credentials
-        username = "puspendersharma"  # Original admin username
-        password = "unionbank"
-        
-        # URL encode the credentials for safety
-        username_encoded = urllib.parse.quote_plus(username)
-        password_encoded = urllib.parse.quote_plus(password)
-        
-        # Create the connection string with admin authentication
-        connection_string = (
-            f"mongodb+srv://{username_encoded}:{password_encoded}@"
-            "msme-loan-app.a0gwq.mongodb.net/"
-            "msme_loan_db?retryWrites=true&w=majority&authSource=admin"
-        )
-        
-        # Initialize client with minimal settings
-        self.client = MongoClient(
-            connection_string,
-            serverSelectionTimeoutMS=5000,  # Lower timeout for faster error detection
-            connectTimeoutMS=5000
-        )
-        
-        # Test connection
-        self.client.admin.command('ping')
-        
-        # Initialize database and GridFS
-        self.db = self.client['msme_loan_db']
-        self.fs = GridFS(self.db)
-        print("MongoDB connection successful!")
-        
-    except Exception as e:
-        error_msg = f"Database connection error: {str(e)}"
-        print(error_msg)  # Print to console for debugging
-        st.error(error_msg)
-        raise e
-        
+            # Admin credentials
+            username = "puspendersharma"  # Original admin username
+            password = "unionbank"
+            
+            # URL encode the credentials for safety
+            username_encoded = urllib.parse.quote_plus(username)
+            password_encoded = urllib.parse.quote_plus(password)
+            
+            # Create the connection string with admin authentication
+            connection_string = (
+                f"mongodb+srv://{username_encoded}:{password_encoded}@"
+                "msme-loan-app.a0gwq.mongodb.net/"
+                "msme_loan_db?retryWrites=true&w=majority&authSource=admin"
+            )
+            
+            # Initialize client with minimal settings
+            self.client = MongoClient(
+                connection_string,
+                serverSelectionTimeoutMS=5000,  # Lower timeout for faster error detection
+                connectTimeoutMS=5000
+            )
+            
+            # Test connection
+            self.client.admin.command('ping')
+            
+            # Initialize database and GridFS
+            self.db = self.client['msme_loan_db']
+            self.fs = GridFS(self.db)
+            print("MongoDB connection successful!")
+            
+        except Exception as e:
+            error_msg = f"Database connection error: {str(e)}"
+            print(error_msg)  # Print to console for debugging
+            st.error(error_msg)
+            raise e
+
     def save_application(self, application_data):
         """Save loan application data"""
         try:
