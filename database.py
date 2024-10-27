@@ -10,55 +10,55 @@ from bson import ObjectId
 class Database:
     def __init__(self):
         try:
-        # Get credentials from Streamlit secrets
-        if hasattr(st, "secrets"):
-            username = st.secrets.mongodb.username
-            password = st.secrets.mongodb.password
-            cluster = st.secrets.mongodb.cluster
-            database = st.secrets.mongodb.database
-        else:
-            # Fallback to hardcoded values (not recommended for production)
-            username = "puspendersharma"
-            password = "unionbank"
-            cluster = "msme-loan-app.a0gwq"
-            database = "msme_loan_db"
-        
-        # URL encode credentials
-        username_encoded = urllib.parse.quote_plus(username)
-        password_encoded = urllib.parse.quote_plus(password)
-        
-        # Connection string with SSL options
-        connection_string = (
-            f"mongodb+srv://{username_encoded}:{password_encoded}@{cluster}.mongodb.net/"
-            f"{database}?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE"
-        )
-        
-        # Initialize client with SSL settings
-        self.client = MongoClient(
-            connection_string,
-            tls=True,
-            tlsAllowInvalidCertificates=True,
-            tlsCAFile=certifi.where(),
-            serverSelectionTimeoutMS=10000,
-            connectTimeoutMS=20000,
-            retryWrites=True,
-            maxPoolSize=1
-        )
-        
-        # Test connection
-        self.client.admin.command('ping')
-        
-        # Initialize database and GridFS
-        self.db = self.client[database]
-        self.fs = GridFS(self.db)
-        print("MongoDB connection successful!")
-        
-    except Exception as e:
-        error_msg = f"Database connection error: {str(e)}"
-        print(error_msg)
-        st.error(error_msg)
-        raise e
-        
+            # Get credentials from Streamlit secrets
+            if hasattr(st, "secrets"):
+                username = st.secrets.mongodb.username
+                password = st.secrets.mongodb.password
+                cluster = st.secrets.mongodb.cluster
+                database = st.secrets.mongodb.database
+            else:
+                # Fallback to hardcoded values (not recommended for production)
+                username = "puspendersharma"
+                password = "unionbank"
+                cluster = "msme-loan-app.a0gwq"
+                database = "msme_loan_db"
+            
+            # URL encode credentials
+            username_encoded = urllib.parse.quote_plus(username)
+            password_encoded = urllib.parse.quote_plus(password)
+            
+            # Connection string with SSL options
+            connection_string = (
+                f"mongodb+srv://{username_encoded}:{password_encoded}@{cluster}.mongodb.net/"
+                f"{database}?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE"
+            )
+            
+            # Initialize client with SSL settings
+            self.client = MongoClient(
+                connection_string,
+                tls=True,
+                tlsAllowInvalidCertificates=True,
+                tlsCAFile=certifi.where(),
+                serverSelectionTimeoutMS=10000,
+                connectTimeoutMS=20000,
+                retryWrites=True,
+                maxPoolSize=1
+            )
+            
+            # Test connection
+            self.client.admin.command('ping')
+            
+            # Initialize database and GridFS
+            self.db = self.client[database]
+            self.fs = GridFS(self.db)
+            print("MongoDB connection successful!")
+            
+        except Exception as e:
+            error_msg = f"Database connection error: {str(e)}"
+            print(error_msg)
+            st.error(error_msg)
+            raise e
+            
     def save_application(self, application_data):
         """Save loan application data"""
         try:
