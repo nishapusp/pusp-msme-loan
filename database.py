@@ -8,7 +8,7 @@ from bson import ObjectId
 
 class Database:
     def __init__(self):
-    try:
+        try:
         # Admin credentials
         username = "puspendersharma"  # Original admin username
         password = "unionbank"
