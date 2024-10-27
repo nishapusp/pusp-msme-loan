@@ -9,7 +9,7 @@ from bson import ObjectId
 
 class Database:
     def __init__(self):
-    try:
+        try:
         # Get credentials from Streamlit secrets
         if hasattr(st, "secrets"):
             username = st.secrets.mongodb.username
