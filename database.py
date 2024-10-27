@@ -14,7 +14,7 @@ class Database:
             password = "unionbank"
             
             # Create the connection string
-            connection_string = f"mongodb+srv://{username}:{password}@msme-loan-app.a0gwq.mongodb.net/msme_loan_db?authSource=admin"
+            connection_string = f"mongodb+srv://{puspmsme2}:{unionbank}@msme-loan-app.a0gwq.mongodb.net/msme_loan_db?authSource=admin"
             
             # Initialize client with minimal settings
             self.client = MongoClient(connection_string)
