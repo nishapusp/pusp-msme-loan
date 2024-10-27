@@ -17,7 +17,7 @@ class Database:
                 cluster = st.secrets.mongodb.cluster
                 database = st.secrets.mongodb.database
             else:
-                username = "puspendersharma"
+                username = "pusp_msme_app2"
                 password = "unionbank"
                 cluster = "msme-loan-app.a0gwq"
                 database = "msme_loan_db"
