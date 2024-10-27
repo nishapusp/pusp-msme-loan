@@ -10,7 +10,7 @@ class Database:
     def __init__(self):
         try:
             # Direct connection string - simpler approach
-            username = "puspendersharma"
+            username = "puspmsme2"
             password = "unionbank"
             
             # Create the connection string
