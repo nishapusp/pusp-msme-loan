@@ -10,14 +10,13 @@ from bson import ObjectId
 class Database:
     def __init__(self):
         try:
-            # Get credentials from Streamlit secrets
+            # Get credentials from Streamlit secrets or use defaults
             if hasattr(st, "secrets"):
                 username = st.secrets.mongodb.username
                 password = st.secrets.mongodb.password
                 cluster = st.secrets.mongodb.cluster
                 database = st.secrets.mongodb.database
             else:
-                # Fallback to hardcoded values (not recommended for production)
                 username = "puspendersharma"
                 password = "unionbank"
                 cluster = "msme-loan-app.a0gwq"
@@ -27,22 +26,17 @@ class Database:
             username_encoded = urllib.parse.quote_plus(username)
             password_encoded = urllib.parse.quote_plus(password)
             
-            # Connection string with SSL options
-            connection_string = (
-                f"mongodb+srv://{username_encoded}:{password_encoded}@{cluster}.mongodb.net/"
-                f"{database}?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE"
-            )
+            # Simplified connection string without SSL options in URL
+            connection_string = f"mongodb+srv://{username_encoded}:{password_encoded}@{cluster}.mongodb.net/?retryWrites=true&w=majority"
             
-            # Initialize client with SSL settings
+            # Initialize client with modified SSL settings
             self.client = MongoClient(
                 connection_string,
                 tls=True,
-                tlsAllowInvalidCertificates=True,
                 tlsCAFile=certifi.where(),
-                serverSelectionTimeoutMS=10000,
-                connectTimeoutMS=20000,
-                retryWrites=True,
-                maxPoolSize=1
+                serverSelectionTimeoutMS=30000,  # Increased timeout
+                connectTimeoutMS=30000,
+                retryWrites=True
             )
             
             # Test connection
@@ -55,7 +49,7 @@ class Database:
             
         except Exception as e:
             error_msg = f"Database connection error: {str(e)}"
-            print(error_msg)
+            print(error_msg)  # Print to console for debugging
             st.error(error_msg)
             raise e
             
