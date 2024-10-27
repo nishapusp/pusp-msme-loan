@@ -8,7 +8,7 @@ from gridfs import GridFS
 from bson import ObjectId
 
 class Database:
-def __init__(self):
+    def __init__(self):
     try:
         # Get credentials from Streamlit secrets
         if hasattr(st, "secrets"):
