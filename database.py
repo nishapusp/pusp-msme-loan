@@ -1,5 +1,5 @@
 import os
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
 import urllib.parse
 import streamlit as st
 from datetime import datetime
@@ -9,42 +9,61 @@ from bson import ObjectId
 class Database:
     def __init__(self):
         try:
-            # Admin credentials
-            username = "puspendersharma"  # Original admin username
-            password = "unionbank"
-            
-            # URL encode the credentials for safety
-            username_encoded = urllib.parse.quote_plus(username)
-            password_encoded = urllib.parse.quote_plus(password)
-            
-            # Create the connection string with admin authentication
-            connection_string = (
-                f"mongodb+srv://{username_encoded}:{password_encoded}@"
-                "msme-loan-app.a0gwq.mongodb.net/"
-                "msme_loan_db?retryWrites=true&w=majority&authSource=admin"
+            # Get connection parameters
+            MONGO_USER = "puspendersharma"
+            MONGO_PASSWORD = "unionbank"
+            MONGO_CLUSTER = "msme-loan-app.a0gwq.mongodb.net"
+            MONGO_DB_NAME = "msme_loan_db"
+
+            # URL encode the credentials
+            encoded_username = urllib.parse.quote_plus(MONGO_USER)
+            encoded_password = urllib.parse.quote_plus(MONGO_PASSWORD)
+
+            # Build the basic connection string
+            basic_uri = (
+                f"mongodb+srv://{encoded_username}:{encoded_password}@{MONGO_CLUSTER}/"
             )
-            
-            # Initialize client with minimal settings
+
+            # Create MongoClient with specific options
             self.client = MongoClient(
-                connection_string,
-                serverSelectionTimeoutMS=5000,  # Lower timeout for faster error detection
-                connectTimeoutMS=5000
+                basic_uri,
+                server_api='1',
+                ssl=True,
+                tlsAllowInvalidCertificates=True,  # Only for testing
+                serverSelectionTimeoutMS=10000,
+                connectTimeoutMS=20000,
+                maxPoolSize=50,
+                wtimeout=2500,
+                retryWrites=True,
+                socketTimeoutMS=20000
             )
+
+            # Access the database
+            self.db = self.client[MONGO_DB_NAME]
             
-            # Test connection
-            self.client.admin.command('ping')
-            
-            # Initialize database and GridFS
-            self.db = self.client['msme_loan_db']
+            # Initialize GridFS
             self.fs = GridFS(self.db)
-            print("MongoDB connection successful!")
-            
+
+            # Verify connection
+            db_list = self.client.list_database_names()
+            if MONGO_DB_NAME in db_list:
+                print(f"Successfully connected to {MONGO_DB_NAME}")
+            else:
+                print(f"Database {MONGO_DB_NAME} does not exist")
+
+            # Test write permission
+            test_collection = self.db.test_collection
+            test_doc = {"test": "connection"}
+            test_collection.insert_one(test_doc)
+            test_collection.delete_one({"test": "connection"})
+            print("Database connection and permissions verified successfully!")
+
         except Exception as e:
             error_msg = f"Database connection error: {str(e)}"
-            print(error_msg)  # Print to console for debugging
-            st.error(error_msg)
+            print(f"Detailed error: {error_msg}")
+            st.error("Failed to connect to database. Please contact support.")
             raise e
-
+            
     def save_application(self, application_data):
         """Save loan application data"""
         try:
